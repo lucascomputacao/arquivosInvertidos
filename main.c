@@ -212,12 +212,10 @@ void read_files(int argc, char** argv) {
 
 
             char vetorArquivos[tamanho + 1];
+            
             fread(&vetorArquivos, tamanho + 1, 1, arquivo);
-
-            int j;
-            for (j = 0; j != '\0'; j++) {
-                printf("%c", vetorArquivos[i]);
-            }
+            printf("arquivo %s\n", &vetorArquivos);
+            
 
         }
     }
