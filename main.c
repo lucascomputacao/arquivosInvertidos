@@ -136,7 +136,7 @@ void read_words(int argc, char** argv) {
 int insere_palavra(int hash, char word[], char nomearquivo[], int posicao) {
     //NoPalavra * busca;
     //if (busca = busca_palavra(word) != NULL) {
-    
+
     if (1 == 0) {
         // palavra já existe
         //busca_arquivo(nomearquivo);
@@ -174,6 +174,7 @@ int insere_palavra(int hash, char word[], char nomearquivo[], int posicao) {
  * @param word - palavra a ser buscada
  * @return ponteiro para palavra buscada ou NULL caso não encontre 
  */
+
 /*
 Palavra busca_palavra(char word[]) {
     int hash = hashing(word);
@@ -188,6 +189,40 @@ Palavra busca_palavra(char word[]) {
 }
  */
 
+void read_files(int argc, char** argv) {
+    char nomeArquivo[100]; // nome do arquivo
+    FILE *arquivo; // ponteiro para o arquivo
+    long tamanho; // tamanho em bytes do arquivo
+
+    // abre o arquivo para leitura
+    int i;
+    for (i = 0; i < argc; i++) {
+        arquivo = fopen(argv[i], "r");
+        // verifica se o arquivo foi aberto com sucesso
+        if (arquivo != NULL) {
+            // movimenta a posição corrente de leitura no arquivo
+            // para o seu fim
+            fseek(arquivo, 0, SEEK_END);
+
+            // pega a posição corrente de leitura no arquivo
+            tamanho = ftell(arquivo);
+
+            // imprime o tamanho do arquivo
+            printf("O arquivo %s possui %ld bytes\n", nomeArquivo, tamanho);
+
+
+            char vetorArquivos[tamanho + 1];
+            fread(&vetorArquivos, tamanho + 1, 1, arquivo);
+
+            int j;
+            for (j = 0; j != '\0'; j++) {
+                printf("%c", vetorArquivos[i]);
+            }
+
+        }
+    }
+}
+
 /*
  * FUNCAO PRINCIPAL
  */
@@ -197,7 +232,8 @@ int main(int argc, char** argv) {
 
     if (argc > 1) {
         //name_arqs(argc, argv);
-        read_words(argc, argv);
+        //read_words(argc, argv);
+        read_files(argc, argv);
     }
     //ler uma palavra e passar para a funcao de hasing
     //que retornara o indice a ser inserido 
