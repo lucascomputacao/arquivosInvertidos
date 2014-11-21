@@ -190,35 +190,34 @@ Palavra busca_palavra(char word[]) {
  */
 
 void read_files(int argc, char** argv) {
-    char nomeArquivo[100]; // nome do arquivo
-    FILE *arquivo; // ponteiro para o arquivo
-    long tamanho; // tamanho em bytes do arquivo
-
-    // abre o arquivo para leitura
     int i;
-    for (i = 0; i < argc; i++) {
-        arquivo = fopen(argv[i], "r");
-        // verifica se o arquivo foi aberto com sucesso
+    for (i = 1; i < argc; i++) {
+        FILE *arquivo = fopen(argv[i], "r");
         if (arquivo != NULL) {
-            // movimenta a posição corrente de leitura no arquivo
-            // para o seu fim
+            // vamos obter o tamanho do arquivo em bytes
             fseek(arquivo, 0, SEEK_END);
+            long tam_arquivo = ftell(arquivo);
+            rewind(arquivo);
 
-            // pega a posição corrente de leitura no arquivo
-            tamanho = ftell(arquivo);
+            // vamos alocar memória para todo o conteúdo do arquivo
+            char *buffer = (char*) malloc(sizeof (char) * tam_arquivo);
+            // a memória foi alocada com sucesso?
+            if (buffer != NULL) {
+                // vamos copiar o conteúdo do arquivo para o buffer
+                size_t resultado = fread(buffer, 1, tam_arquivo, arquivo);
 
-            // imprime o tamanho do arquivo
-            printf("O arquivo %s possui %ld bytes\n", nomeArquivo, tamanho);
-
-
-            char vetorArquivos[tamanho + 1];
-            
-            fread(&vetorArquivos, tamanho + 1, 1, arquivo);
-            printf("arquivo %s\n", &vetorArquivos);
-            
-
+                // vamos verificar se a operação foi feita com sucesso
+                if (resultado == tam_arquivo) {
+                    puts("O conteudo do arquivo foi lido com sucesso\n\n");
+                    // vamos exibí-lo na tela
+                    puts(buffer);
+                }
+            }
+            fclose(arquivo); // fecha o arquivo
+            free(buffer); // libera a memória do buffer
         }
     }
+
 }
 
 /*
