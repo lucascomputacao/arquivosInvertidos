@@ -191,8 +191,10 @@ Palavra busca_palavra(char word[]) {
 
 void read_files(int argc, char** argv) {
     int i;
+    FILE *arquivo;
+    
     for (i = 1; i < argc; i++) {
-        FILE *arquivo = fopen(argv[i], "r");
+        arquivo = fopen(argv[i], "r");
         if (arquivo != NULL) {
             // vamos obter o tamanho do arquivo em bytes
             fseek(arquivo, 0, SEEK_END);
@@ -203,14 +205,13 @@ void read_files(int argc, char** argv) {
             char *buffer = (char*) malloc(sizeof (char) * tam_arquivo);
             // a memória foi alocada com sucesso?
             if (buffer != NULL) {
-                // vamos copiar o conteúdo do arquivo para o buffer
+                // copiar o conteúdo do arquivo para o buffer
                 size_t resultado = fread(buffer, 1, tam_arquivo, arquivo);
 
-                // vamos verificar se a operação foi feita com sucesso
+                // verificar se a operação foi feita com sucesso
                 if (resultado == tam_arquivo) {
-                    puts("O conteudo do arquivo foi lido com sucesso\n\n");
-                    // vamos exibí-lo na tela
-                    puts(buffer);
+                    printf("O conteudo do arquivo foi lido com sucesso\n\n");
+                    printf("%s\n", buffer);
                 }
             }
             fclose(arquivo); // fecha o arquivo
