@@ -136,7 +136,7 @@ void read_words(int argc, char** argv) {
 int insere_palavra(int hash, char word[], char nomearquivo[], int posicao) {
     //NoPalavra * busca;
     //if (busca = busca_palavra(word) != NULL) {
-    
+
     if (1 == 0) {
         // palavra já existe
         //busca_arquivo(nomearquivo);
@@ -174,6 +174,7 @@ int insere_palavra(int hash, char word[], char nomearquivo[], int posicao) {
  * @param word - palavra a ser buscada
  * @return ponteiro para palavra buscada ou NULL caso não encontre 
  */
+
 /*
 Palavra busca_palavra(char word[]) {
     int hash = hashing(word);
@@ -188,6 +189,37 @@ Palavra busca_palavra(char word[]) {
 }
  */
 
+void read_files(int argc, char** argv) {
+    int i;
+    for (i = 1; i < argc; i++) {
+        FILE *arquivo = fopen(argv[i], "r");
+        if (arquivo != NULL) {
+            // vamos obter o tamanho do arquivo em bytes
+            fseek(arquivo, 0, SEEK_END);
+            long tam_arquivo = ftell(arquivo);
+            rewind(arquivo);
+
+            // vamos alocar memória para todo o conteúdo do arquivo
+            char *buffer = (char*) malloc(sizeof (char) * tam_arquivo);
+            // a memória foi alocada com sucesso?
+            if (buffer != NULL) {
+                // vamos copiar o conteúdo do arquivo para o buffer
+                size_t resultado = fread(buffer, 1, tam_arquivo, arquivo);
+
+                // vamos verificar se a operação foi feita com sucesso
+                if (resultado == tam_arquivo) {
+                    puts("O conteudo do arquivo foi lido com sucesso\n\n");
+                    // vamos exibí-lo na tela
+                    puts(buffer);
+                }
+            }
+            fclose(arquivo); // fecha o arquivo
+            free(buffer); // libera a memória do buffer
+        }
+    }
+
+}
+
 /*
  * FUNCAO PRINCIPAL
  */
@@ -197,7 +229,8 @@ int main(int argc, char** argv) {
 
     if (argc > 1) {
         //name_arqs(argc, argv);
-        read_words(argc, argv);
+        //read_words(argc, argv);
+        read_files(argc, argv);
     }
     //ler uma palavra e passar para a funcao de hasing
     //que retornara o indice a ser inserido 
