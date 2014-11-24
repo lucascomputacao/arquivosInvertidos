@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fcntl.h>
 
 #define NTABHASH  11
 #define MAX 100000
@@ -77,52 +78,30 @@ int hashing(char palavra[]) {
     return hash;
 }
 
-/* Read dictionary words */
-void read_words(int argc, char** argv) {
-    FILE *arquivo;
-    int i, j, hash, countPosicao;
+/* Leitura de palavras do arquivo */
+void read_words(char arquivo[]) {
+    int i = 0, j = 0, hash, countPosicao = 0;
     char caracter, word[MAX];
-    //long tamanho;
 
-
-    //printf("argc = %d\n", argc);
-    // Loop de leitura das palavras nos arquivos
-    for (i = 1; i < argc; i++) {
-        countPosicao = 0; // contador de posicao da palavra no texto
-
-        printf("%s\n", argv[i]);
-        if ((arquivo = fopen(argv[i], "r")) == NULL) {
-            printf("Erro ao abrir arquivo!!!\n\n");
-            exit(1);
-        }
-        printf("caracter = %c\n", caracter);
-
-        // loop to read characters
-        while ((caracter) != EOF) {
+    //   printf("caracter = %c\n", arquivo[5]);
+    printf("conteudo do arquivo: %s\n", arquivo);
+    while (arquivo[i] != '\0' || arquivo[i] != EOF) {
+        if ((arquivo[i] >= 65) && (arquivo[i] <= 122)) {
+            word[j] = arquivo[i];
+            j++;
+            i++;
+            //printf("mais um j!\n");
+        } else if (j) {
+            word[j] = '\0'; // encerra string
+            countPosicao++; // incrementa a posição de palavra
+            printf("palavra lida = %s\n posicao = %d\n", word, countPosicao);
+            hash = hashing(word);
+            printf("hashing = %d\n", hash);
+            //insere_palavra(hash, word, argv[i], countPosicao);
             j = 0;
-            //__fpurge(stdin); // limpeza de buffer Linux
-            caracter = fgetc(arquivo);
-            while ((caracter >= 65) && (caracter <= 122)) { //A-z
-                word[j] = caracter;
-                caracter = fgetc(arquivo);
-                j++;
-            }
-            // word's insertion
-            if (j) {
-                countPosicao++;
-                word[j] = '\0';
-                //passar a palavra lida para  a funcao de insercao
-                // l = inserts_Ordered(l, word);
-                printf("palavra lida = %s\n posicao = %d\n", word, countPosicao);
-                hash = hashing(word);
-                printf("hashing = %d\narquivo %s\n", hash, argv[i]);
-                //insere palavra
-                insere_palavra(hash, word, argv[i], countPosicao);
-            }
         }
-        fclose(arquivo); // fecha arquivo
-        caracter = '\0'; // "limpa" o caracter para o while continuar funcionando
     }
+    printf("fim da função\n");
 }
 
 /**
@@ -192,7 +171,7 @@ Palavra busca_palavra(char word[]) {
 void read_files(int argc, char** argv) {
     int i;
     FILE *arquivo;
-    
+
     for (i = 1; i < argc; i++) {
         arquivo = fopen(argv[i], "r");
         if (arquivo != NULL) {
@@ -211,9 +190,10 @@ void read_files(int argc, char** argv) {
                 // verificar se a operação foi feita com sucesso
                 if (resultado == tam_arquivo) {
                     printf("O conteudo do arquivo foi lido com sucesso\n\n");
-                    printf("%s\n", buffer);
+                    //printf("%s\n", buffer);
                 }
             }
+            read_words(buffer);
             fclose(arquivo); // fecha o arquivo
             free(buffer); // libera a memória do buffer
         }
