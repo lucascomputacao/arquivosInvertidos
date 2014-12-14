@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   main.c
  * Author: Lucas Borges Teixeira dos Santos
  *
@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fcntl.h>
 
 #define NTABHASH  11
 #define MAX 100000
@@ -43,7 +44,7 @@ typedef struct NoPosicao {
 } NoPosicao, *Posicao;
 
 /**
- * Cria vetor de apontadores 
+ * Cria vetor de apontadores
  */
 void inicializaVetor() {
     int i;
@@ -55,7 +56,7 @@ void inicializaVetor() {
 
 /**
  * funcao para calcular o indice de armazenamento no vetor de apontadores
- * 
+ *
  * @param palavra
  * @return hash [inteiro que será indice do vetor de apontadores]
  */
@@ -77,56 +78,53 @@ int hashing(char palavra[]) {
     return hash;
 }
 
-/* Read dictionary words */
-void read_words(int argc, char** argv) {
-    FILE *arquivo;
-    int i, j, hash, countPosicao;
+/* Leitura de palavras do arquivo */
+void read_words(char arquivo[]) {
+    int i = 0, j, hash, countPosicao;
     char caracter, word[MAX];
-    //long tamanho;
+    countPosicao = 0; // contador de posicao da palavra no texto
 
-
-    //printf("argc = %d\n", argc);
-    // Loop de leitura das palavras nos arquivos
-    for (i = 1; i < argc; i++) {
-        countPosicao = 0; // contador de posicao da palavra no texto
-
-        printf("%s\n", argv[i]);
-        if ((arquivo = fopen(argv[i], "r")) == NULL) {
-            printf("Erro ao abrir arquivo!!!\n\n");
-            exit(1);
-        }
-        printf("caracter = %c\n", caracter);
-
+    //   printf("caracter = %c\n", arquivo[5]);
+    printf("conteudo do arquivo: %s", arquivo);
+    while (arquivo[i] != EOF) {
+        printf("dentro do while");
+        printf("%c", arquivo[i]);
+        i++;
+    }
+    /*
         // loop to read characters
-        while ((caracter) != EOF) {
-            j = 0;
-            //__fpurge(stdin); // limpeza de buffer Linux
-            caracter = fgetc(arquivo);
-            while ((caracter >= 65) && (caracter <= 122)) { //A-z
-                word[j] = caracter;
-                caracter = fgetc(arquivo);
-                j++;
+        while (caracter != EOF || caracter != '\0') {
+
+            //printf("conteudo do arquivo: %s\n", arquivo);
+
+            for (i = 0; caracter != '\0' || caracter != EOF ; i++) {
+                printf("entrou no for\n");
+                caracter = arquivo[i];
+                if ((caracter >= 65) && (caracter <= 122)) {
+                    word[j] = caracter;
+                    j++;
+                }
             }
-            // word's insertion
+
+            // ao menos uma letra...
             if (j) {
-                countPosicao++;
-                word[j] = '\0';
-                //passar a palavra lida para  a funcao de insercao
-                // l = inserts_Ordered(l, word);
+                word[j] = '\0'; // encerra string
+                countPosicao++; // incrementa a posição de palavra
                 printf("palavra lida = %s\n posicao = %d\n", word, countPosicao);
                 hash = hashing(word);
-                printf("hashing = %d\narquivo %s\n", hash, argv[i]);
-                //insere palavra
-                insere_palavra(hash, word, argv[i], countPosicao);
+                printf("hashing = %d\n", hash);
+                //insere_palavra(hash, word, argv[i], countPosicao);
             }
-        }
-        fclose(arquivo); // fecha arquivo
-        caracter = '\0'; // "limpa" o caracter para o while continuar funcionando
-    }
+
+            printf("caracter = %c\n", caracter);
+        }*/
+    fclose(arquivo); // fecha arquivo
+    caracter = '\0'; // "limpa" o caracter para o while continuar funcionando
+
 }
 
 /**
- * 
+ *
  * @param hashing - calculado pela funcao hashing
  * @param word - palavra a ser inserida
  * @param arquivo - nome do arquivo onde a palavra aparece
@@ -170,9 +168,9 @@ int insere_palavra(int hash, char word[], char nomearquivo[], int posicao) {
 }
 
 /**
- * 
+ *
  * @param word - palavra a ser buscada
- * @return ponteiro para palavra buscada ou NULL caso não encontre 
+ * @return ponteiro para palavra buscada ou NULL caso não encontre
  */
 
 /*
@@ -184,15 +182,17 @@ Palavra busca_palavra(char word[]) {
     if (vet[hash].vet != NULL) {
         buscada = vet[hash].vet;
     }
-    
+
     //return ;
 }
  */
 
 void read_files(int argc, char** argv) {
     int i;
+    FILE *arquivo;
+
     for (i = 1; i < argc; i++) {
-        FILE *arquivo = fopen(argv[i], "r");
+        arquivo = fopen(argv[i], "r");
         if (arquivo != NULL) {
             // vamos obter o tamanho do arquivo em bytes
             fseek(arquivo, 0, SEEK_END);
@@ -203,16 +203,16 @@ void read_files(int argc, char** argv) {
             char *buffer = (char*) malloc(sizeof (char) * tam_arquivo);
             // a memória foi alocada com sucesso?
             if (buffer != NULL) {
-                // vamos copiar o conteúdo do arquivo para o buffer
+                // copiar o conteúdo do arquivo para o buffer
                 size_t resultado = fread(buffer, 1, tam_arquivo, arquivo);
 
-                // vamos verificar se a operação foi feita com sucesso
+                // verificar se a operação foi feita com sucesso
                 if (resultado == tam_arquivo) {
-                    puts("O conteudo do arquivo foi lido com sucesso\n\n");
-                    // vamos exibí-lo na tela
-                    puts(buffer);
+                    printf("O conteudo do arquivo foi lido com sucesso\n\n");
+                    //printf("%s\n", buffer);
                 }
             }
+            read_words(buffer);
             fclose(arquivo); // fecha o arquivo
             free(buffer); // libera a memória do buffer
         }
@@ -233,16 +233,16 @@ int main(int argc, char** argv) {
         read_files(argc, argv);
     }
     //ler uma palavra e passar para a funcao de hasing
-    //que retornara o indice a ser inserido 
+    //que retornara o indice a ser inserido
 
     return (EXIT_SUCCESS);
 }
 
 /**
- * 
+ *
  * @param argc - passado direto da função main
  * @param argv - passado direto da função main
- * 
+ *
  * Salva(exibe) os nomes dos arquivos passados como parametro
  */
 void name_arqs(int argc, char ** argv) {
