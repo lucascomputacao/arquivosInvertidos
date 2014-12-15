@@ -32,7 +32,7 @@ typedef struct NoPalavra {
 
 /* estrutura para lita de arquivos onde a palavra aparece*/
 typedef struct NoArquivo {
-    char nomeArquivo;
+    char nomeArquivo[100];
     struct NoArquivo *proxArq;
     struct NoPosicao *listaPosicoes;
 } NoArquivo, *Arquivo;
@@ -74,38 +74,39 @@ int hashing(char palavra[]) {
     /*calcula o valor de hash para armazenamento no vetor de apontadores*/
     hash = (soma % NTABHASH);
 
-    fprintf(stderr, "hash => %d \n", hash );
+    fprintf(stderr, "hash => %d \n", hash);
     /*retornando o indice do vetor onde será armaznada a palavra em questao*/
     return hash;
 }
 
 /* Leitura de palavras do arquivo */
-void read_words(char arquivo[]) {
+void read_words(char arquivo[], char** argv) {
     int i = 0, j = 0, hash, countPosicao = 0;
     char caracter, word[MAX];
 
-    //   printf("caracter = %c\n", arquivo[5]);
-    printf("conteudo do arquivo: %s\n", arquivo);
-   do{
-    //fprintf(stderr, "aqui > %c\n", arquivo[33] );
+    fprintf(stderr, "conteudo do arquivo: %s\n", argv);
+    do {
+        //fprintf(stderr, "aqui > %c\n", arquivo[33] );
         if ((arquivo[i] >= 65) && (arquivo[i] <= 122)) {
             word[j] = arquivo[i];
             //fprintf(stderr, "arquivo > %c; word > %c\n", arquivo[i],word[j] );           
             j++;
-            i++;           
-        } else if (j > 0 ) {
+            i++;
+        } else if (j > 0) {
             word[j] = '\0'; // encerra string
             countPosicao++; // incrementa a posição de palavra
             fprintf(stderr, "palavra lida = %s;\n posicao = %d;\n", word, countPosicao);
             hash = hashing(word);
-            //insere_palavra(hash, word, argv[i], countPosicao);
-            if( arquivo[i + 1] != '\0' || arquivo[i + 1] != EOF){
+            if (insere_palavra(hash, word, argv, countPosicao)) {
+                fprintf(stderr, "Palavra '%s' inserida com sucesso!\n", word);
+            }
+            if (arquivo[i + 1] != '\0' || arquivo[i + 1] != EOF) {
                 j = 0;
                 i++;
             }
-            
+
         }
-    } while (arquivo[i] != '\0' ) ;
+    } while (arquivo[i] != '\0');
     fprintf(stderr, "fim da função read_words\n");
 }
 
@@ -117,40 +118,104 @@ void read_words(char arquivo[]) {
  * @param posicao - posicao no texto onde a palvra aparece
  * @return 1, caso inserido com sucesso e 0 caso contrário
  */
-int insere_palavra(int hash, char word[], char nomearquivo[], int posicao) {
-    //NoPalavra * busca;
-    //if (busca = busca_palavra(word) != NULL) {
+int insere_palavra(int hash, char** word, char** nomearquivo, int posicao) {
+    NoPalavra *plvra;
+    NoArquivo *arq;
+    NoPosicao *pos;
 
-    if (1 == 0) {
-        // palavra já existe
-        //busca_arquivo(nomearquivo);
-        //if palavra e arquivo já existirem apenas acrescenta a posicao
+    fprintf(stderr, "nome do arquivo: %s\t palavra: %s \t hash: %d \t posicao: %d\n", nomearquivo, word, hash, posicao);
 
-
-    } else {// palavra não existe
-        // alocacoes
-        NoPalavra* palavra = (NoPalavra*) malloc(sizeof (NoPalavra));
-        NoArquivo* arquivo = (NoArquivo*) malloc(sizeof (NoArquivo));
-        NoPosicao* posicao = (NoPosicao*) malloc(sizeof (NoPosicao));
-
-        // preenchedo conteudo das estruturas e acertando ponteiros
-        strcpy(palavra->palavra, word);
-        palavra->listaArquivos = arquivo;
-        strcpy(arquivo->nomeArquivo, nomearquivo);
-        arquivo->listaPosicoes = posicao;
-        posicao->posicao = posicao;
-
-        // inserindo na lista
-        if (vet[hash].vet == NULL) {
-            vet[hash].vet = palavra;
-            palavra->proxPalavra = NULL;
-        } else {
-            // inere no inicio da lista - menos custoso/nao necessita de ordem
-            palavra->proxPalavra = vet[hash].vet;
-            vet[hash].vet = palavra;
+    // Lista de palavras NAO-VAZIA
+    if (vet[hash].vet != NULL) {
+        fprintf(stderr, " LISTA DE PALAVRAS NAO VAZIA \n");
+        // fazer busca por palavra para verificar existência e
+        // só depois inserir ou não a palavra
+        for (plvra = vet[hash].vet; plvra != NULL; plvra = plvra->proxPalavra) {
+            
+            // Palavra ja existe na lista
+            if (strcmp(plvra->palavra, word) == 0) {
+                fprintf(stderr, " palavra já existe na lista \n");
+                // se ja existe, testa se o arquivo ja existe na lista de arquivos da palavra               
+                for (arq = plvra->listaArquivos; arq != NULL; arq = arq->proxArq) {
+                    // se o arquivo ja existe, acrescenta a posição na lista de posições
+                    if (strcmp(arq->nomeArquivo, nomearquivo) == 0) {
+                        if (arq->listaPosicoes != NULL) {
+                            pos->proxPos = arq->listaPosicoes;
+                        }
+                        arq->listaPosicoes = pos;
+                        return 1;
+                    }
+                }
+                // não encontrou arquivo na lista de arquivos
+                if (arq == NULL) {
+                    fprintf(stderr, " arquivo não existe na lista\n");
+                    NoArquivo* arq = (NoArquivo*) malloc(sizeof (NoArquivo));
+                    NoPosicao* pos = (NoPosicao*) malloc(sizeof (NoPosicao));
+                    // conteudo
+                    plvra->listaArquivos = arq;
+                    strcpy(arq->nomeArquivo, nomearquivo);
+                    arq->listaPosicoes = posicao;
+                    arq->proxArq = NULL;
+                    pos->posicao = posicao;
+                    pos->proxPos = NULL;
+                    
+                    return 1;
+                }
+            }
         }
+        if (plvra == NULL) {
+            fprintf(stderr, " palavra não existe na lista \n");
+            // alocacoes
+            NoPalavra* plvra = (NoPalavra*) malloc(sizeof (NoPalavra));
+            NoArquivo* arq = (NoArquivo*) malloc(sizeof (NoArquivo));
+            NoPosicao* pos = (NoPosicao*) malloc(sizeof (NoPosicao));
+
+            // preenchedo conteudo das estruturas e acertando ponteiros       
+
+            strcpy(plvra->palavra, word);
+            plvra->listaArquivos = arq;
+            strcpy(arq->nomeArquivo, nomearquivo);
+            arq->listaPosicoes = posicao;
+            arq->proxArq = NULL;
+            pos->posicao = posicao;
+            pos->proxPos = NULL;
+
+            // Inserindo na lista de palavras   
+            vet[hash].vet = plvra;
+            plvra->proxPalavra = NULL;
+            
+            return 1;
+        }
+
+    }
+    // Lista de palavras VAZIA
+    if (vet[hash].vet == NULL) {
+        fprintf(stderr, " LISTA DE PALAVRAS VAZIA \n");
+
+        // alocacoes
+        NoPalavra* plvra = (NoPalavra*) malloc(sizeof (NoPalavra));
+        NoArquivo* arq = (NoArquivo*) malloc(sizeof (NoArquivo));
+        NoPosicao* pos = (NoPosicao*) malloc(sizeof (NoPosicao));
+
+        // preenchedo conteudo das estruturas e acertando ponteiros       
+
+        strcpy(plvra->palavra, word);
+        plvra->listaArquivos = arq;
+        strcpy(arq->nomeArquivo, nomearquivo);
+        arq->listaPosicoes = posicao;
+        arq->proxArq = NULL;
+        pos->posicao = posicao;
+        pos->proxPos = NULL;
+
+        // Inserindo na lista de palavras   
+        vet[hash].vet = plvra;
+        plvra->proxPalavra = NULL;
+
+        // inserida com sucesso
         return 1;
     }
+    // caso nao inserida 
+    return 0;
 }
 
 /**
@@ -158,19 +223,29 @@ int insere_palavra(int hash, char word[], char nomearquivo[], int posicao) {
  * @param word - palavra a ser buscada
  * @return ponteiro para palavra buscada ou NULL caso não encontre 
  */
-
-/*
-Palavra busca_palavra(char word[]) {
+Palavra busca_palavra(char** word) {
     int hash = hashing(word);
     NoPalavra* buscada;
+    NoPalavra* p;
 
     // Vetor não nulo
     if (vet[hash].vet != NULL) {
         buscada = vet[hash].vet;
+        for (p = buscada; p != NULL; p = buscada->proxPalavra) {
+            if (strcmp(buscada->palavra, word) != 0) {
+                return buscada;
+            }
+        }
     }
-    
-    //return ;
+
+    // Vetor nulo - insere na primeira posição
+    if (vet[hash].vet == NULL) {
+        return NULL;
+    }
 }
+
+/*
+ * Lê todos os arquivos e passa as palavras de cada um para a função de read_words()
  */
 
 void read_files(int argc, char** argv) {
@@ -199,10 +274,23 @@ void read_files(int argc, char** argv) {
                 }
             }
             // passa o arquivo inteiro lido para a função de 
-            read_words(buffer);
+            read_words(buffer, argv[i]);
             fclose(arquivo); // fecha o arquivo
             free(buffer); // libera a memória do buffer
         }
+    }
+
+}
+
+void print_lista_palavras() {
+    int i;
+    NoPalavra* palavra;
+
+    // i?
+    palavra = vet[i].vet;
+    for (i = 0; i < NTABHASH; i++) {
+
+
     }
 
 }
@@ -213,13 +301,17 @@ void read_files(int argc, char** argv) {
 int main(int argc, char** argv) {
     //FILE *arquivo;
     //long tamanho;
+    int i;
 
     if (argc > 1) {
+        //fprintf(stderr, "nome do arquivo: %s\n", argv[i] );
         //ler uma palavra e passar para a funcao de hasing
         read_files(argc, argv);
 
+
+
     }
-    
+
     //que retornara o indice a ser inserido 
 
     return (EXIT_SUCCESS);
