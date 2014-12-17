@@ -80,7 +80,11 @@ int hashing(char palavra[]) {
     return hash;
 }
 
-/* Leitura de palavras do arquivo */
+/**
+ * Leitura de palavras do arquivo
+ * @param arquivo String com as palavras a serem lidas
+ * @param argv nome do arquivo
+ */
 void read_words(char arquivo[], char** argv) {
     int i = 0, j = 0, hash, countPosicao = 0;
     char caracter, word[MAX];
@@ -142,10 +146,9 @@ int insere_palavra(int hash, char** word, char** nomearquivo, int posicao) {
                     // se o arquivo ja existe, acrescenta a posição na lista de posições
                     if (strcmp(arq->nomeArquivo, nomearquivo) == 0) {
                         fprintf(stderr, " palavra já existe - dentro do for - if strcmp \n");
+                        NoPosicao* pos = (NoPosicao*) malloc(sizeof (NoPosicao));
                         if (arq->listaPosicoes != NULL) {
                             fprintf(stderr, " palavra já existe na lista - if arq->listaPosicoes != NULL \n");
-                            NoPosicao* pos = (NoPosicao*) malloc(sizeof (NoPosicao));
-                            // linhas abaixo causando erro
                             pos->proxPos = arq->listaPosicoes;
                             //fprintf(stderr, " aqui tio\n");
                         }
@@ -252,10 +255,42 @@ Palavra busca_palavra(char** word) {
     }
 }
 
+void read_phrases() {
+    char phrase[MAX], word[MAX];
+    int i = 0, j = 0, countPosicao = 0, hash;
+
+    fprintf(stderr, "digite a frase: \n");
+    scanf("%[^\n]", &phrase);
+    fprintf(stderr, "frase digitada: %s\n", phrase);
+
+    // leitura das palavras da frase digitada
+    while (phrase[i] != '\0') {
+        if (phrase[i] != 32) {
+            word[j] = phrase[i];
+            i++;
+            j++;
+        }
+        if (phrase[i] == 32) {
+            word[j] = '\0';
+            countPosicao++;
+            fprintf(stderr, "palavra da frase lida: %s\n", word);
+            j = 0;
+            i++;
+        }
+        if (phrase[i] == '\0') {
+            word[j] = '\0';
+            countPosicao++;
+            fprintf(stderr, "palavra da frase lida: %s\n", word);
+        }
+    }
+
+
+
+}
+
 /*
  * Lê todos os arquivos e passa as palavras de cada um para a função de read_words()
  */
-
 void read_files(int argc, char** argv) {
     int i;
     FILE *arquivo;
@@ -290,19 +325,6 @@ void read_files(int argc, char** argv) {
 
 }
 
-void print_lista_palavras() {
-    int i;
-    NoPalavra* palavra;
-
-    // i?
-    palavra = vet[i].vet;
-    for (i = 0; i < NTABHASH; i++) {
-
-
-    }
-
-}
-
 /*
  * FUNCAO PRINCIPAL
  */
@@ -315,9 +337,7 @@ int main(int argc, char** argv) {
         //fprintf(stderr, "nome do arquivo: %s\n", argv[i] );
         //ler uma palavra e passar para a funcao de hasing
         read_files(argc, argv);
-
-
-
+        read_phrases();
     }
 
     //que retornara o indice a ser inserido 
