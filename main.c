@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
+#include <ctype.h>
 
 #define NTABHASH  11
 #define MAX 100000
@@ -88,7 +89,7 @@ void read_words(char arquivo[], char** argv) {
     do {
         //fprintf(stderr, "aqui > %c\n", arquivo[33] );
         if ((arquivo[i] >= 65) && (arquivo[i] <= 122)) {
-            word[j] = arquivo[i];
+            word[j] = tolower(arquivo[i]); //Transforma todas as letras em minúsculas
             //fprintf(stderr, "arquivo > %c; word > %c\n", arquivo[i],word[j] );           
             j++;
             i++;
@@ -131,7 +132,7 @@ int insere_palavra(int hash, char** word, char** nomearquivo, int posicao) {
         // fazer busca por palavra para verificar existência e
         // só depois inserir ou não a palavra
         for (plvra = vet[hash].vet; plvra != NULL; plvra = plvra->proxPalavra) {
-            
+
             // Palavra ja existe na lista
             if (strcmp(plvra->palavra, word) == 0) {
                 fprintf(stderr, " palavra já existe na lista \n");
@@ -164,7 +165,7 @@ int insere_palavra(int hash, char** word, char** nomearquivo, int posicao) {
                     arq->proxArq = NULL;
                     pos->posicao = posicao;
                     pos->proxPos = NULL;
-                    
+
                     return 1;
                 }
             }
@@ -190,7 +191,7 @@ int insere_palavra(int hash, char** word, char** nomearquivo, int posicao) {
             // Inserindo na lista de palavras   
             vet[hash].vet = plvra;
             plvra->proxPalavra = NULL;
-            
+
             return 1;
         }
 
