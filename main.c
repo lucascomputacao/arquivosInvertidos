@@ -137,10 +137,16 @@ int insere_palavra(int hash, char** word, char** nomearquivo, int posicao) {
                 fprintf(stderr, " palavra já existe na lista \n");
                 // se ja existe, testa se o arquivo ja existe na lista de arquivos da palavra               
                 for (arq = plvra->listaArquivos; arq != NULL; arq = arq->proxArq) {
+                    fprintf(stderr, " palavra já existe - dentro do for \n");
                     // se o arquivo ja existe, acrescenta a posição na lista de posições
                     if (strcmp(arq->nomeArquivo, nomearquivo) == 0) {
+                        fprintf(stderr, " palavra já existe - dentro do for - if strcmp \n");
                         if (arq->listaPosicoes != NULL) {
+                            fprintf(stderr, " palavra já existe na lista - if arq->listaPosicoes != NULL \n");
+                            NoPosicao* pos = (NoPosicao*) malloc(sizeof (NoPosicao));
+                            // linhas abaixo causando erro
                             pos->proxPos = arq->listaPosicoes;
+                            //fprintf(stderr, " aqui tio\n");
                         }
                         arq->listaPosicoes = pos;
                         return 1;
@@ -154,7 +160,7 @@ int insere_palavra(int hash, char** word, char** nomearquivo, int posicao) {
                     // conteudo
                     plvra->listaArquivos = arq;
                     strcpy(arq->nomeArquivo, nomearquivo);
-                    arq->listaPosicoes = posicao;
+                    arq->listaPosicoes = pos;
                     arq->proxArq = NULL;
                     pos->posicao = posicao;
                     pos->proxPos = NULL;
@@ -173,10 +179,11 @@ int insere_palavra(int hash, char** word, char** nomearquivo, int posicao) {
             // preenchedo conteudo das estruturas e acertando ponteiros       
 
             strcpy(plvra->palavra, word);
-            plvra->listaArquivos = arq;
+            fprintf(stderr, " inserido string '%s' \n", word);
             strcpy(arq->nomeArquivo, nomearquivo);
-            arq->listaPosicoes = posicao;
+            arq->listaPosicoes = pos;
             arq->proxArq = NULL;
+            plvra->listaArquivos = arq;
             pos->posicao = posicao;
             pos->proxPos = NULL;
 
